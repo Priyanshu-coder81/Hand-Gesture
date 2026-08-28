@@ -18,6 +18,7 @@ class VideoProcessor(VideoProcessorBase):
 
         # Detect hands
         results = self.hand_detector.detect(img)
+        img = self.hand_detector.draw_landmarks(img, results)
 
         # Temporary debug output
         if results.hand_landmarks:

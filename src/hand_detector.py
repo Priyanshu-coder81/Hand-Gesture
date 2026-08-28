@@ -1,6 +1,7 @@
 from pathlib import Path
 import time
 
+import cv2
 import mediapipe as mp
 import numpy as np
 
@@ -31,13 +32,21 @@ class HandDetector:
             options,
         )
 
+        self.mp_draw = mp.tasks.vision.drawing_utils
+        self.mp_draw_styles = mp.tasks.vision.drawing_styles
+        self.hand_connections = (
+            mp.tasks.vision.HandLandmarksConnections.HAND_CONNECTIONS
+        )
+
     def detect(self, frame):
         """
         Detect hands in an OpenCV BGR frame.
 
         Returns MediaPipe HandLandmarkerResult.
         """
-        rgb_frame = np.ascontiguousarray(frame[:, :, ::-1])
+        rgb_frame = np.ascontiguousarray(
+            cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        )
         mp_image = mp.Image(
             image_format=mp.ImageFormat.SRGB,
             data=rgb_frame,
@@ -49,3 +58,18 @@ class HandDetector:
         self._timestamp_ms = timestamp_ms
 
         return self.landmarker.detect_for_video(mp_image, timestamp_ms)
+
+    def draw_landmarks(self, frame, results):
+        if not results.hand_landmarks:
+            return frame
+
+        for hand_landmarks in results.hand_landmarks:
+            self.mp_draw.draw_landmarks(
+                frame,
+                hand_landmarks,
+                self.hand_connections,
+                self.mp_draw_styles.get_default_hand_landmarks_style(),
+                self.mp_draw_styles.get_default_hand_connections_style(),
+            )
+
+        return frame
