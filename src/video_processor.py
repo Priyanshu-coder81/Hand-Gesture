@@ -5,11 +5,13 @@ from streamlit_webrtc import VideoProcessorBase
 
 from .hand_detector import HandDetector
 
+from .guesture_classifier import GestureClassifier
 
 class VideoProcessor(VideoProcessorBase):
 
     def __init__(self):
         self.hand_detector = HandDetector()
+        self.gesture_classifier = GestureClassifier()
 
     def recv(self, frame):
 
@@ -22,9 +24,14 @@ class VideoProcessor(VideoProcessorBase):
 
         # Temporary debug output
         if results.hand_landmarks:
+            landmarks = results.hand_landmarks[0]
+
+            gesture = self.gesture_classifier.classify(
+                landmarks
+            )
             cv2.putText(
                 img,
-                "Hand detected",
+                f"Guesture : {gesture}",
                 (30, 50),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 1,

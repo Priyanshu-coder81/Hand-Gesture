@@ -17,7 +17,15 @@ st.write(
 )
 
 
-webrtc_streamer(
-    key="gesture-detector",
-    video_processor_factory=VideoProcessor,
-)
+_, camera_col, _ = st.columns([1, 2, 1])
+
+with camera_col:
+    webrtc_streamer(
+        key="gesture-detector",
+        video_processor_factory=VideoProcessor,
+        video_html_attrs={
+            "autoPlay": True,
+            "controls": False,
+            "style": {"width": "100%", "maxWidth": "900px"},
+        },
+    )
