@@ -1,3 +1,5 @@
+import queue
+
 import av
 import cv2
 
@@ -11,10 +13,11 @@ from .gesture_recognizer import GestureDetector
 
 class VideoProcessor(VideoProcessorBase):
 
-    def __init__(self):
+    def __init__(self, event_queue=None):
         self.gesture_detector = GestureDetector()
         self.stabilizer = GestureStabilizer(required_frames=5)
         self.event_manager = GestureEventManager()
+        self.event_queue = event_queue
         self._last_event = None
 
     def recv(self, frame):
@@ -52,7 +55,7 @@ class VideoProcessor(VideoProcessorBase):
                 should_emit = self.event_manager.should_emit(stable_gesture)
                 if should_emit:
                     self._last_event = stable_gesture
-                    print(f"Gesture event: {stable_gesture}")
+                    self._enqueue_event(stable_gesture, score)
         else:
             self.stabilizer.reset()
             if results.hand_landmarks:
@@ -107,3 +110,17 @@ class VideoProcessor(VideoProcessorBase):
             img,
             format="bgr24",
         )
+
+    def _enqueue_event(self, gesture, confidence):
+        if self.event_queue is None:
+            return
+
+        try:
+            self.event_queue.put_nowait(
+                {
+                    "gesture": gesture,
+                    "confidence": confidence,
+                }
+            )
+        except queue.Full:
+            pass
