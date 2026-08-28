@@ -55,6 +55,11 @@ with camera_col:
     webrtc_streamer(
         key="gesture-detector",
         video_processor_factory=processor_factory,
+        rtc_configuration={
+            "iceServers": [
+                {"urls": ["stun:stun.l.google.com:19302"]},
+            ],
+        },
         video_html_attrs={
             "autoPlay": True,
             "controls": False,

@@ -1,0 +1,11 @@
+.venv
+__pycache__
+*.pyc
+.git
+.gitignore
+.env
+.streamlit/secrets.toml
+.pytest_cache
+.DS_Store
+*.md
+src/requirements.txt
