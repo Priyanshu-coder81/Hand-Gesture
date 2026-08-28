@@ -1,4 +1,6 @@
 import streamlit as st
+from streamlit_webrtc import webrtc_streamer
+from src import VideoProcessor
 
 
 st.set_page_config(
@@ -8,19 +10,14 @@ st.set_page_config(
 )
 
 
+st.title("✋ Real-Time Hand Gesture Detector")
+
 st.write(
-    "Allow camera access and capture an image from your webcam."
+    "Start the camera to begin receiving video frames."
 )
 
-camera_image = st.camera_input("Take a picture")
 
-if camera_image is not None:
-    st.subheader("Camera Frame")
-
-    st.image(
-        camera_image,
-        caption="Captured frame",
-        use_container_width=True,
-    )
-else:
-    st.info("Please allow camera access and capture an image.")
+webrtc_streamer(
+    key="gesture-detector",
+    video_processor_factory=VideoProcessor,
+)
